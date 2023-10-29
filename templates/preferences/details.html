@@ -1,0 +1,78 @@
+{% extends 'base_user.html'%} {% block content %}
+
+<div class="container mt-3">
+  <h5>Bonds</h5>
+  {% include 'partials/_messages.html' %}
+
+  <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <input type="text" class="form-control" id="searchField" placeholder="Search">
+        </div>
+      </div>
+    <div class="col-md-2">
+      <a href="{% url 'bonds' %}" class="btn btn-primary">Add more bonds</a>
+    </div>
+  </div>
+
+<div class="app-table">
+  <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:11.5px;">
+    <thead class="thead-light">
+      <tr>
+        <th>Name</th>
+        <th>maturity_years</th>
+        <th>profitability</th>
+        <th>coupon_yield</th>
+        <th>coupon_yield_last</th>
+        <th>rating</th>
+        <th>volume</th>
+        <th>coupon_value</th>
+        <th>coupon_payments_frequency</th>
+        <th>accumulated_income</th>
+        <th>duration</th>
+        <th>price</th>
+        <th>next_coupon_date</th>
+        <th>issue_date</th>
+        <th>maturity_date</th>
+        <th>offer_date</th>
+        <th>company</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for bond in bonds%}
+      <tr>
+        <td>{{bond.name}}</td>
+        <td>{{bond.maturity_years}}</td>
+        <td>{{bond.profitability}}</td>
+        <td>{{bond.coupon_yield}}</td>
+        <td>{{bond.coupon_yield_last}}</td>
+        <td>{{bond.rating}}</td>
+        <td>{{bond.volume}}</td>
+        <td>{{bond.coupon}}</td>
+        <td>{{bond.coupon_payments_frequency}}</td>
+        <td>{{bond.accumulated_income}}</td>
+        <td>{{bond.duration}}</td>
+        <td>{{bond.price}}</td>
+        <td>{{bond.next_coupon_date}}</td>
+        <td>{{bond.issue_date}}</td>
+        <td>{{bond.maturity_date}}</td>
+        <td>{{bond.offer_date}}</td>
+        <td>{{bond.company.name}}</td>
+
+        <td>
+          <a href="{{request.path}}/delete/{{bond.pk}}"
+            class="btn btn-secondary btn-sm"
+            >Delete</a
+          >
+        </td>
+      </tr>
+
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+{% endblock %}
