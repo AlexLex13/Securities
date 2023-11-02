@@ -72,6 +72,16 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "KEY_PREFIX": "fin"
+    }
+}
+
+CACHE_TTL = 60 * 15
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
