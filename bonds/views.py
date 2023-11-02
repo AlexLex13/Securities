@@ -1,24 +1,21 @@
 import json
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.views.decorators.cache import cache_page
 
 from userpreferences.models import UserPreference
 from .models import Bond
 
-
-def search_bonds(request):
-    if request.method == 'POST':
-        search_str = json.loads(request.body).get('searchText')
-        bonds = Bond.objects.filter(name__icontains=search_str)
-
-        data = bonds.values()
-        return JsonResponse(list(data), safe=False)
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
+@cache_page(CACHE_TTL)
 def index(request):
     bonds = Bond.objects.all().select_related('company')
     paginator = Paginator(bonds, 5)
@@ -28,6 +25,15 @@ def index(request):
         'page_obj': page_obj
     }
     return render(request, 'bonds/index.html', context)
+
+
+def search_bonds(request):
+    if request.method == 'POST':
+        search_str = json.loads(request.body).get('searchText')
+        bonds = Bond.objects.filter(name__icontains=search_str)
+
+        data = bonds.values()
+        return JsonResponse(list(data), safe=False)
 
 
 @login_required(login_url='/authentication/login')

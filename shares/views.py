@@ -1,14 +1,31 @@
 import json
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
 
 from userpreferences.models import UserPreference
 from .models import Share
+
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+
+
+@method_decorator(cache_page(CACHE_TTL), name='dispatch')
+class SharesView(ListView):
+    template_name = 'shares/index.html'
+    context_object_name = 'shares'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Share.objects.all().select_related('company')
 
 
 def search_shares(request):
@@ -20,15 +37,6 @@ def search_shares(request):
 
         data = shares.values()
         return JsonResponse(list(data), safe=False)
-
-
-class SharesView(ListView):
-    template_name = 'shares/index.html'
-    context_object_name = 'shares'
-    paginate_by = 5
-
-    def get_queryset(self):
-        return Share.objects.all().select_related('company')
 
 
 @login_required(login_url='/authentication/login')
