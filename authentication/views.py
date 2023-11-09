@@ -1,19 +1,17 @@
 import json
-import socket
 
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from django.views import View
 from validate_email import validate_email
 
+from .tasks import sent_activate_mail
 from .utils import account_activation_token
 
 
@@ -65,32 +63,7 @@ class RegistrationView(View):
                 user.save()
 
                 current_site = get_current_site(request)
-                email_body = {
-                    'user': user,
-                    'domain': current_site.domain,
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                    'token': account_activation_token.make_token(user),
-                }
-
-                link = reverse('activate', kwargs={
-                    'uidb64': email_body['uid'], 'token': email_body['token']})
-
-                email_subject = 'Activate your account'
-
-                activate_url = 'http://' + current_site.domain + link
-
-                sent_mail_count = 0
-                while sent_mail_count != 1:
-                    try:
-                        sent_mail_count = send_mail(
-                            email_subject,
-                            'Hi ' + user.username + ', Please the link below to activate your account \n' + activate_url,
-                            'noreply@semycolon.com',
-                            [email],
-                            fail_silently=False,
-                        )
-                    except socket.gaierror:
-                        pass
+                sent_activate_mail(user, current_site.domain)
 
                 messages.success(request, 'Account successfully created! Check your email.')
                 return render(request, 'authentication/register.html')
