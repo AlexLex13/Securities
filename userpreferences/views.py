@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from bonds.models import Bond
 from shares.models import Share
 from .models import UserPreference
-from .tasks import create_csv
+from .tasks import create_csv, create_pdf
 
 
 @login_required(login_url='/authentication/login')
@@ -93,11 +93,24 @@ def delete_share(request, name, share_pk):
 
 def export_csv(request, name):
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=Securities_' + \
+    response['Content-Disposition'] = f'attachment; filename={name}_' + \
                                       str(datetime.datetime.now()) + '.csv'
 
     user_preference = UserPreference.objects.get(user=request.user, name=name)
 
     create_csv(response, user_preference)
+
+    return response
+
+
+def export_pdf(request, name):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; attachment; filename={name}_' + \
+                                      str(datetime.datetime.now()) + '.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
+
+    create_pdf(response, user_preference)
 
     return response

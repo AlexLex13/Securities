@@ -8,6 +8,7 @@ preference_patterns = [
     path('del_bond/<int:bond_pk>', views.delete_bond, name="delete-bond"),
     path('del_share/<int:share_pk>', views.delete_share, name="delete-share"),
     path('export_csv', views.export_csv, name="export-csv"),
+    path('export_pdf', views.export_pdf, name="export-pdf"),
 ]
 
 urlpatterns = [
