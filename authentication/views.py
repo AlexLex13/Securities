@@ -1,18 +1,24 @@
 import json
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.views import View
+from django.views.decorators.cache import cache_page
 from validate_email import validate_email
 
 from .tasks import sent_activate_mail
 from .utils import account_activation_token
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 class EmailValidationView(View):
@@ -37,6 +43,7 @@ class UsernameValidationView(View):
         return JsonResponse({'username_valid': True})
 
 
+@method_decorator(cache_page(CACHE_TTL), name='dispatch')
 class RegistrationView(View):
     def get(self, request):
         return render(request, 'authentication/register.html')
@@ -94,6 +101,7 @@ class VerificationView(View):
         return redirect('login')
 
 
+@method_decorator(cache_page(CACHE_TTL), name='dispatch')
 class LoginView(View):
     def get(self, request):
         return render(request, 'authentication/login.html')
