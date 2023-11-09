@@ -1,12 +1,15 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bonds.models import Bond
 from shares.models import Share
 from .models import UserPreference
+from .tasks import create_csv
 
 
 @login_required(login_url='/authentication/login')
@@ -59,6 +62,7 @@ def preference_details(request, name):
     user_preference = UserPreference.objects.get(user=request.user, name=name)
 
     context = {
+        'name': name,
         'bonds': user_preference.bonds.all(),
         'shares': user_preference.shares.all()
     }
@@ -69,7 +73,7 @@ def preference_details(request, name):
 def delete_bond(request, name, bond_pk):
     bond = Bond.objects.get(pk=bond_pk)
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name).select_related('bonds')
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
     user_preference.bonds.remove(bond)
 
     messages.success(request, f'The bond has been successfully removed from set "{name}"')
@@ -80,8 +84,20 @@ def delete_bond(request, name, bond_pk):
 def delete_share(request, name, share_pk):
     share = Share.objects.get(pk=share_pk)
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name).select_related('shares')
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
     user_preference.shares.remove(share)
 
     messages.success(request, f'The share has been successfully removed from set "{name}"')
     return redirect('preference-details', name)
+
+
+def export_csv(request, name):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Securities_' + \
+                                      str(datetime.datetime.now()) + '.csv'
+
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
+
+    create_csv(response, user_preference)
+
+    return response
