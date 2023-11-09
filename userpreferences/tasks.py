@@ -1,6 +1,9 @@
 import csv
+import tempfile
 
 import dramatiq
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 
 @dramatiq.actor
@@ -37,3 +40,21 @@ def create_csv(response, user_preference):
                          share.volume, share.last_transaction_time, share.weekly_price_change,
                          share.monthly_price_change, share.annual_price_change,
                          share.capitalization, share.volume_change, share.company.name])
+
+
+@dramatiq.actor
+def create_pdf(response, user_preference):
+    bonds = user_preference.bonds.all()
+    shares = user_preference.shares.all()
+
+    html_string = render_to_string(
+        'preferences/pdf-output.html', {'bonds': bonds, 'shares': shares})
+    html = HTML(string=html_string)
+
+    result = html.write_pdf()
+
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output.seek(0)
+        response.write(output.read())
