@@ -1,10 +1,11 @@
 import csv
 import tempfile
+from io import BytesIO
 
 import dramatiq
-import xlsxwriter
 from django.template.loader import render_to_string
 from weasyprint import HTML
+import pandas as pd
 
 BONDS_COLUMNS = [
     'name', 'maturity_years', 'profitability', 'coupon_yield',
@@ -64,36 +65,24 @@ def create_pdf(response, user_preference):
 
 @dramatiq.actor
 def create_excel(response, user_preference):
-    workbook = xlsxwriter.Workbook()
-    bold = workbook.add_format({'bold': True})
+    bonds = user_preference.bonds.all()
+    shares = user_preference.shares.all()
 
-    worksheet = workbook.add_worksheet('Bonds')
+    bonds_table = {}
+    for i, key in enumerate(BONDS_COLUMNS):
+        bonds_table[key] = [bond.get_fields()[i] for bond in bonds]
 
-    row_num = 0
-    for col_num in range(len(BONDS_COLUMNS)):
-        worksheet.write(row_num, col_num, BONDS_COLUMNS[col_num], bold)
+    bonds_df = pd.DataFrame(bonds_table)
 
-    rows = user_preference.bonds.all()
+    shares_table = {}
+    for i, key in enumerate(SHARES_COLUMNS):
+        shares_table[key] = [share.get_fields()[i] for share in shares]
 
-    for row in rows:
-        row_num += 1
+    shares_df = pd.DataFrame(shares_table)
 
-        for col_num in range(len(row)):
-            worksheet.write(row_num, col_num, str(row[col_num]))
-
-    worksheet = workbook.add_worksheet('Shares')
-
-    row_num = 0
-    for col_num in range(len(SHARES_COLUMNS)):
-        worksheet.write(row_num, col_num, SHARES_COLUMNS[col_num], bold)
-
-    rows = user_preference.shares.all()
-
-    for row in rows:
-        row_num += 1
-
-        for col_num in range(len(row)):
-            worksheet.write(row_num, col_num, str(row[col_num]))
-
-    workbook.close()
-    response.write(workbook)
+    with BytesIO() as b:
+        writer = pd.ExcelWriter(b, engine='xlsxwriter')
+        bonds_df.to_excel(writer, sheet_name='Bonds')
+        shares_df.to_excel(writer, sheet_name='Shares')
+        writer.close()
+        response.write(b.getvalue())
