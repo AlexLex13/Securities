@@ -2,6 +2,7 @@ import csv
 import tempfile
 
 import dramatiq
+import xlsxwriter
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
@@ -59,3 +60,40 @@ def create_pdf(response, user_preference):
         output.flush()
         output.seek(0)
         response.write(output.read())
+
+
+@dramatiq.actor
+def create_excel(response, user_preference):
+    workbook = xlsxwriter.Workbook()
+    bold = workbook.add_format({'bold': True})
+
+    worksheet = workbook.add_worksheet('Bonds')
+
+    row_num = 0
+    for col_num in range(len(BONDS_COLUMNS)):
+        worksheet.write(row_num, col_num, BONDS_COLUMNS[col_num], bold)
+
+    rows = user_preference.bonds.all()
+
+    for row in rows:
+        row_num += 1
+
+        for col_num in range(len(row)):
+            worksheet.write(row_num, col_num, str(row[col_num]))
+
+    worksheet = workbook.add_worksheet('Shares')
+
+    row_num = 0
+    for col_num in range(len(SHARES_COLUMNS)):
+        worksheet.write(row_num, col_num, SHARES_COLUMNS[col_num], bold)
+
+    rows = user_preference.shares.all()
+
+    for row in rows:
+        row_num += 1
+
+        for col_num in range(len(row)):
+            worksheet.write(row_num, col_num, str(row[col_num]))
+
+    workbook.close()
+    response.write(workbook)
