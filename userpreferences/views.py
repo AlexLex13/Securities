@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from bonds.models import Bond
 from shares.models import Share
 from .models import UserPreference
-from .tasks import create_csv, create_pdf
+from .tasks import create_csv, create_pdf, create_excel
 
 
 @login_required(login_url='/authentication/login')
@@ -112,5 +112,17 @@ def export_pdf(request, name):
     user_preference = UserPreference.objects.get(user=request.user, name=name)
 
     create_pdf(response, user_preference)
+
+    return response
+
+
+def export_excel(request, name):
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={name}_' + \
+                                      str(datetime.datetime.now()) + '.xlsx'
+
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
+
+    create_excel(response, user_preference)
 
     return response
