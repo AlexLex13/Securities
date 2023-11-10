@@ -24,6 +24,15 @@ class Bond(models.Model):
 
     objects = models.Manager()
 
+    def get_fields(self):
+        return [
+            self.name, self.maturity_years, self.profitability, self.coupon_yield,
+            self.coupon_yield_last, self.rating, self.volume, self.coupon_value,
+            self.coupon_payments_frequency, self.accumulated_income, self.duration,
+            self.price, self.next_coupon_date, self.issue_date,
+            self.maturity_date, self.offer_date, self.company.name
+        ]
+
     def __str__(self):
         return self.name
 
