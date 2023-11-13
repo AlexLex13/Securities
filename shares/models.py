@@ -15,7 +15,7 @@ class Share(models.Model):
     annual_price_change = models.FloatField(null=True, blank=True)
     capitalization = MoneyField(max_digits=16, decimal_places=2, default_currency='USD')
     volume_change = models.FloatField()
-    company = models.OneToOneField(to=Company, on_delete=models.CASCADE, primary_key=True)
+    company = models.OneToOneField(to=Company, on_delete=models.CASCADE)
 
     objects = models.Manager()
 
