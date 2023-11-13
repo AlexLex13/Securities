@@ -63,8 +63,8 @@ def preference_details(request, name):
 
     context = {
         'name': name,
-        'bonds': user_preference.bonds.all(),
-        'shares': user_preference.shares.all()
+        'bonds': user_preference.bonds.all().select_related('company'),
+        'shares': user_preference.shares.all().select_related('company')
     }
     return render(request, 'preferences/details.html', context)
 

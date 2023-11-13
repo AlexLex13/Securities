@@ -28,7 +28,7 @@ def create_csv(response, user_preference):
 
     writer.writerow(BONDS_COLUMNS)
 
-    bonds = user_preference.bonds.all()
+    bonds = user_preference.bonds.all().select_related('company')
 
     writer.writerow(['Bonds'])
     for bond in bonds:
@@ -38,7 +38,7 @@ def create_csv(response, user_preference):
 
     writer.writerow(SHARES_COLUMNS)
 
-    shares = user_preference.shares.all()
+    shares = user_preference.shares.all().select_related('company')
 
     writer.writerow(['Shares'])
     for share in shares:
@@ -47,8 +47,8 @@ def create_csv(response, user_preference):
 
 @dramatiq.actor
 def create_pdf(response, user_preference):
-    bonds = user_preference.bonds.all()
-    shares = user_preference.shares.all()
+    bonds = user_preference.bonds.all().select_related('company')
+    shares = user_preference.shares.all().select_related('company')
 
     html_string = render_to_string(
         'preferences/pdf-output.html', {'bonds': bonds, 'shares': shares})
@@ -65,8 +65,8 @@ def create_pdf(response, user_preference):
 
 @dramatiq.actor
 def create_excel(response, user_preference):
-    bonds = user_preference.bonds.all()
-    shares = user_preference.shares.all()
+    bonds = user_preference.bonds.all().select_related('company')
+    shares = user_preference.shares.all().select_related('company')
 
     bonds_table = {}
     for i, key in enumerate(BONDS_COLUMNS):
