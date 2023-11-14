@@ -7,26 +7,15 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 import pandas as pd
 
-BONDS_COLUMNS = [
-    'name', 'maturity_years', 'profitability', 'coupon_yield',
-    'coupon_yield_last', 'rating', 'volume', 'coupon_value',
-    'coupon_payments_frequency', 'accumulated_income', 'duration',
-    'price', 'next_coupon_date', 'issue_date', 'maturity_date',
-    'offer_date', 'company'
-]
-
-SHARES_COLUMNS = [
-    'name', 'ticker', 'last_price', 'price_change', 'volume',
-    'last_transaction_time', 'weekly_price_change', 'monthly_price_change',
-    'annual_price_change', 'capitalization', 'volume_change', 'company'
-]
+from bonds.models import Bond
+from shares.models import Share
 
 
 @dramatiq.actor
 def create_csv(response, user_preference):
     writer = csv.writer(response)
 
-    writer.writerow(BONDS_COLUMNS)
+    writer.writerow(Bond.FIELDS)
 
     bonds = user_preference.bonds.all().select_related('company')
 
@@ -36,7 +25,7 @@ def create_csv(response, user_preference):
 
     writer.writerow([])
 
-    writer.writerow(SHARES_COLUMNS)
+    writer.writerow(Share.FIELDS)
 
     shares = user_preference.shares.all().select_related('company')
 
@@ -69,13 +58,13 @@ def create_excel(response, user_preference):
     shares = user_preference.shares.all().select_related('company')
 
     bonds_table = {}
-    for i, key in enumerate(BONDS_COLUMNS):
+    for i, key in enumerate(Bond.FIELDS):
         bonds_table[key] = [bond.get_fields()[i] for bond in bonds]
 
     bonds_df = pd.DataFrame(bonds_table)
 
     shares_table = {}
-    for i, key in enumerate(SHARES_COLUMNS):
+    for i, key in enumerate(Share.FIELDS):
         shares_table[key] = [share.get_fields()[i] for share in shares]
 
     shares_df = pd.DataFrame(shares_table)

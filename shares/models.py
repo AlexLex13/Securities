@@ -19,6 +19,12 @@ class Share(models.Model):
 
     objects = models.Manager()
 
+    FIELDS = [
+        'name', 'ticker', 'last_price', 'price_change', 'volume',
+        'last_transaction_time', 'weekly_price_change', 'monthly_price_change',
+        'annual_price_change', 'capitalization', 'volume_change', 'company'
+    ]
+
     def get_fields(self):
         return [
             self.name, self.ticker, self.last_price, self.price_change,

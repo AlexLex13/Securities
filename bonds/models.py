@@ -8,7 +8,7 @@ class Bond(models.Model):
     maturity_years = models.FloatField()
     profitability = models.FloatField()
     coupon_yield = models.FloatField()
-    coupon_yield_last = models.FloatField()
+    coupon_yield_last = models.FloatField(null=True, blank=True)
     rating = models.CharField(max_length=4, null=True, blank=True)
     volume = MoneyField(max_digits=16, decimal_places=2, default_currency='USD')
     coupon_value = MoneyField(max_digits=5, decimal_places=2, default_currency='USD')
@@ -23,6 +23,14 @@ class Bond(models.Model):
     company = models.ForeignKey(to=Company, on_delete=models.CASCADE)
 
     objects = models.Manager()
+
+    FIELDS = [
+        'name', 'maturity_years', 'profitability', 'coupon_yield',
+        'coupon_yield_last', 'rating', 'volume', 'coupon_value',
+        'coupon_payments_frequency', 'accumulated_income', 'duration',
+        'price', 'next_coupon_date', 'issue_date', 'maturity_date',
+        'offer_date', 'company'
+    ]
 
     def get_fields(self):
         return [
