@@ -1,10 +1,10 @@
-const title = document.querySelector("#title");
-const select = document.querySelector("#sel");
-const submit = document.querySelector("#submit");
+function load(name) {
+    const title = document.querySelector("#title_" + name);
+    const select = document.querySelector("#sel_" + name);
+    const submit = document.querySelector("#submit_" + name);
 
-function load() {
     if (select.innerHTML == "") {
-      fetch("/preferences/show_user_pref", {
+      fetch("/preferences/show", {
         method: "GET",
       })
       .then((res) => res.json())

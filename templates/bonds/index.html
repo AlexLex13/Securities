@@ -31,6 +31,7 @@
   <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:11.5px;">
     <thead class="thead-light">
       <tr>
+        <th>№</th>
         <th>Name</th>
         <th>maturity_years</th>
         <th>profitability</th>
@@ -55,48 +56,38 @@
     <tbody>
       {% for bond in page_obj%}
       <tr>
-        <td>{{bond.name}}</td>
-        <td>{{bond.maturity_years}}</td>
-        <td>{{bond.profitability}}</td>
-        <td>{{bond.coupon_yield}}</td>
-        <td>{{bond.coupon_yield_last}}</td>
-        <td>{{bond.rating}}</td>
-        <td>{{bond.volume}}</td>
-        <td>{{bond.coupon}}</td>
-        <td>{{bond.coupon_payments_frequency}}</td>
-        <td>{{bond.accumulated_income}}</td>
-        <td>{{bond.duration}}</td>
-        <td>{{bond.price}}</td>
-        <td>{{bond.next_coupon_date}}</td>
-        <td>{{bond.issue_date}}</td>
-        <td>{{bond.maturity_date}}</td>
-        <td>{{bond.offer_date}}</td>
-        <td>{{bond.company.name}}</td>
-
+        {% for field in bond%}
+        <td>{{field}}</td>
+        {% endfor %}
+        <td></td>
         <td>
           <button type="button"
                   class="btn btn-secondary btn-sm"
-                  onclick="window.Dialog.showModal();load()"
-                  title="Log in into your account!"
+                  onclick="window.Dialog_{{bond.0}}.showModal();load('{{bond.0}}')"
                   {% if not request.user.is_authenticated %}
+                    title="Log in into your account!"
                     disabled
                   {% endif %}
             >Add
           </button>
-          <dialog id="Dialog">
+          <dialog id="Dialog_{{bond.0}}">
             <div class="container">
-              <form action="{% url 'add-bond' bond.pk %}" method="post">
+              <form action="{% url 'add-bond' bond.1 %}" method="post">
                 {% csrf_token %}
-                <h5 id="title">Choose a set:</h5>
-                <select name="name" id="sel" class="d-block form-select form-select-lg mb-3"></select>
+                <h5 id="title_{{bond.0}}">Choose a set:</h5>
+                <select name="ref_name" id="sel_{{bond.0}}" class="d-block form-select form-select-lg mb-3"></select>
                 <input type="submit"
                        value="Add"
                        class="d-block btn btn-primary btn-primary-sm"
-                       id="submit"
+                       id="submit_{{bond.0}}"
+                />
+                <input type="hidden"
+                       name="fields"
+                       value="{{ bond }}"
                 />
                 <button type="button"
                         class="d-block btn btn-secondary btn-secondary-sm"
-                        onclick="window.Dialog.close()"
+                        onclick="window.Dialog_{{bond.0}}.close()"
                 >Cancel
                 </button>
               </form>
