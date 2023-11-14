@@ -1,24 +1,19 @@
 import json
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.views.decorators.cache import cache_page
 
 from userpreferences.models import UserPreference
 from .models import Bond
+from .tasks import fetch_bonds, processing_fields
 
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
-
-@cache_page(CACHE_TTL)
 def index(request):
-    bonds = Bond.objects.all().select_related('company')
-    paginator = Paginator(bonds, 5)
+    bonds = fetch_bonds()
+    paginator = Paginator(bonds, 15)
     page_number = request.GET.get('page')
     page_obj = Paginator.get_page(paginator, page_number)
     context = {
@@ -37,7 +32,7 @@ def search_bonds(request):
 
 
 @login_required(login_url='/authentication/login')
-def add_bond(request, pk):
+def add_bond(request, bond_name):
     preferences = UserPreference.objects.filter(user=request.user)
 
     if not preferences.exists():
@@ -45,15 +40,19 @@ def add_bond(request, pk):
         return redirect('bonds')
 
     if request.method == 'POST':
-        name = request.POST['name']
-
-        bond = Bond.objects.get(pk=pk)
+        name = request.POST['ref_name']
 
         selected_preference = preferences.get(name=name)
 
-        if selected_preference.bonds.contains(bond):
+        if len(selected_preference.bonds.filter(name=bond_name)):
             messages.info(request, f'The bond has already been added to set "{name}"')
             return redirect('bonds')
+
+        bond_fields = processing_fields(request.POST['fields'])
+
+        dct = dict(zip(Bond.FIELDS, bond_fields))
+        bond = Bond(**dct, company_id=1)
+        bond.save()
 
         selected_preference.bonds.add(bond)
         messages.success(request, f'The bond has been successfully added to set "{name}"')
