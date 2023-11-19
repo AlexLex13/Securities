@@ -17,7 +17,7 @@
     </div>
   </div>
 
-   <div class="container">
+  <div class="container">
     {% include 'partials/_messages.html' %}
 
     <div class="row">
@@ -31,6 +31,7 @@
   <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
     <thead>
       <tr>
+        <th>№</th>
         <th>Name</th>
         <th>ticker</th>
         <th>last_price</th>
@@ -50,43 +51,38 @@
     <tbody>
       {% for share in shares %}
       <tr>
-        <td>{{share.name}}</td>
-        <td>{{share.ticker}}</td>
-        <td>{{share.last_price}}</td>
-        <td>{{share.price_change}}</td>
-        <td>{{share.volume}}</td>
-        <td>{{share.last_transaction_time}}</td>
-        <td>{{share.weekly_price_change}}</td>
-        <td>{{share.monthly_price_change}}</td>
-        <td>{{share.annual_price_change}}</td>
-        <td>{{share.capitalization}}</td>
-        <td>{{share.volume_change}}</td>
-        <td>{{share.company}}</td>
-
+        {% for field in share %}
+        <td>{{field}}</td>
+        {% endfor %}
+        <td></td>
         <td>
           <button type="button"
                   class="btn btn-secondary btn-sm"
-                  onclick="window.Dialog.showModal();load()"
-                  title="Log in into your account!"
+                  onclick="window.Dialog_{{share.0}}.showModal();load('{{share.0}}')"
                   {% if not request.user.is_authenticated %}
+                    title="Log in into your account!"
                     disabled
                   {% endif %}
             >Add
           </button>
-          <dialog id="Dialog">
+          <dialog id="Dialog_{{share.0}}">
             <div class="container">
-              <form action="{% url 'add-share' share.pk %}" method="post">
+              <form action="{% url 'add-share' share.2 %}" method="post">
                 {% csrf_token %}
-                <h5 id="title">Choose a set:</h5>
-                <select name="name" id="sel" class="d-block form-select form-select-lg mb-3"></select>
+                <h5 id="title_{{share.0}}">Choose a set:</h5>
+                <select name="ref_name" id="sel_{{share.0}}" class="d-block form-select form-select-lg mb-3"></select>
                 <input type="submit"
                        value="Add"
                        class="d-block btn btn-primary btn-primary-sm"
-                       id="submit"
+                       id="submit_{{share.0}}"
+                />
+                <input type="hidden"
+                       name="fields"
+                       value="{{ share }}"
                 />
                 <button type="button"
                         class="d-block btn btn-secondary btn-secondary-sm"
-                        onclick="window.Dialog.close()"
+                        onclick="window.Dialog_{{share.0}}.close()"
                 >Cancel
                 </button>
               </form>
