@@ -1,31 +1,24 @@
 import json
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
 
 from userpreferences.models import UserPreference
 from .models import Share
+from .tasks import fetch_shares, processing_shares
 
 
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-
-
-@method_decorator(cache_page(CACHE_TTL), name='dispatch')
 class SharesView(ListView):
     template_name = 'shares/index.html'
     context_object_name = 'shares'
-    paginate_by = 5
+    paginate_by = 15
 
     def get_queryset(self):
-        return Share.objects.all().select_related('company')
+        return fetch_shares()
 
 
 def search_shares(request):
@@ -40,7 +33,7 @@ def search_shares(request):
 
 
 @login_required(login_url='/authentication/login')
-def add_share(request, pk):
+def add_share(request, ticker):
     preferences = UserPreference.objects.filter(user=request.user)
 
     if not preferences.exists():
@@ -48,15 +41,19 @@ def add_share(request, pk):
         return redirect('shares')
 
     if request.method == 'POST':
-        name = request.POST['name']
-
-        share = Share.objects.get(pk=pk)
+        name = request.POST['ref_name']
 
         selected_preference = preferences.get(name=name)
 
-        if selected_preference.shares.contains(share):
+        if len(selected_preference.shares.filter(ticker=ticker)):
             messages.info(request, f'The share has already been added to set "{name}"')
             return redirect('shares')
+
+        share_fields = processing_shares(request.POST['fields'])
+
+        dct = dict(zip(Share.FIELDS, share_fields))
+        share = Share(**dct, company_id=1)
+        share.save()
 
         selected_preference.shares.add(share)
         messages.success(request, f'The share has been successfully added to set "{name}"')
