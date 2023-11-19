@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 
 from userpreferences.models import UserPreference
 from .models import Bond
-from .tasks import fetch_bonds, processing_fields
+from .tasks import fetch_bonds, processing_bonds
 
 
 def index(request):
@@ -48,7 +48,7 @@ def add_bond(request, bond_name):
             messages.info(request, f'The bond has already been added to set "{name}"')
             return redirect('bonds')
 
-        bond_fields = processing_fields(request.POST['fields'])
+        bond_fields = processing_bonds(request.POST['fields'])
 
         dct = dict(zip(Bond.FIELDS, bond_fields))
         bond = Bond(**dct, company_id=1)

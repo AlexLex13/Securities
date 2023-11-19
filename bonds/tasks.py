@@ -32,7 +32,7 @@ def fetch_bonds():
 
 
 @dramatiq.actor
-def processing_fields(fields):
+def processing_bonds(fields):
     fields_list = [field.strip("[]'%") for field in fields.split(", ")[1:]]
     for i, field in enumerate(fields_list):
         if field == '-':
