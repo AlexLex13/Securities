@@ -51,7 +51,15 @@ def create_preference(request):
 
 @login_required(login_url='/authentication/login')
 def delete_preference(request, name):
-    UserPreference.objects.filter(user=request.user, name=name).delete()
+    user_preference = UserPreference.objects.get(user=request.user, name=name)
+
+    for bond in user_preference.bonds.all():
+        Bond.objects.get(name=bond.name).delete()
+
+    for share in user_preference.shares.all():
+        Share.objects.get(ticker=share.ticker).delete()
+
+    user_preference.delete()
 
     messages.success(request, f'Set "{name}" successfully deleted')
     return redirect('preferences')
@@ -75,6 +83,7 @@ def delete_bond(request, name, bond_pk):
 
     user_preference = UserPreference.objects.get(user=request.user, name=name)
     user_preference.bonds.remove(bond)
+    bond.delete()
 
     messages.success(request, f'The bond has been successfully removed from set "{name}"')
     return redirect('preference-details', name)
@@ -86,6 +95,7 @@ def delete_share(request, name, share_pk):
 
     user_preference = UserPreference.objects.get(user=request.user, name=name)
     user_preference.shares.remove(share)
+    share.delete()
 
     messages.success(request, f'The share has been successfully removed from set "{name}"')
     return redirect('preference-details', name)
