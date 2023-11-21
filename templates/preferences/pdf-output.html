@@ -5,11 +5,11 @@
     <title>PDF Output</title>
     <style>
         @page{
-            size: "A4";
+            size: A4 landscape;
             margin: 2.5cm 1.5cm 3.5cm 1.5cm;
 
             @top-center {
-                content: "Company name";
+                content: "Securities";
             }
 
             @bottom-right {
@@ -21,7 +21,7 @@
 <body>
   <h3>Bonds</h3>
   <div class="app-table">
-    <table class="table table-stripped table-hover table-sm table-bordered">
+    <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:10px;">
       <thead class="thead-light">
         <tr>
           <th>Name</th>
@@ -73,7 +73,7 @@
 
   <h3>Shares</h3>
   <div class="app-table">
-  <table class="table table-stripped table-hover table-sm table-bordered">
+  <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:10px;">
     <thead>
       <tr>
         <th>Name</th>
