@@ -1,5 +1,6 @@
 import datetime
 
+import pandas
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -10,6 +11,7 @@ from bonds.models import Bond
 from shares.models import Share
 from .models import UserPreference
 from .tasks import create_csv, create_pdf, create_excel
+from .utils import parse_bonds_df
 
 
 @login_required(login_url='/authentication/login')
@@ -43,7 +45,19 @@ def create_preference(request):
             messages.error(request, f'A set named "{name}" already exists!')
             return redirect('create-preference')
 
-        UserPreference.objects.create(name=name, description=description, user=request.user)
+        user_preference = UserPreference.objects.create(name=name, description=description, user=request.user)
+
+        if request.POST.getlist('import'):
+            file = request.FILES['file']
+            if file.content_type.endswith('sheet'):
+                df = pandas.read_excel(file, 'Bonds')
+
+            bonds_list = parse_bonds_df(df)
+            for bond_fields in bonds_list:
+                dct = dict(zip(Bond.FIELDS, bond_fields))
+                bond = Bond(**dct, company_id=1)
+                bond.save()
+                user_preference.bonds.add(bond)
 
         messages.success(request, f'Set "{name}" has been successfully created')
         return redirect('preferences')
