@@ -1,37 +1,33 @@
-import csv
+import json
 import tempfile
-from io import BytesIO
+from io import StringIO, BytesIO
 
 import dramatiq
+import pandas as pd
 from django.template.loader import render_to_string
 from weasyprint import HTML
-import pandas as pd
 
-from bonds.models import Bond
-from shares.models import Share
-
+from userpreferences.utils import create_df
 
 @dramatiq.actor
-def create_csv(response, user_preference):
-    writer = csv.writer(response)
+def create_json(response, user_preference):
+    bonds_df, shares_df = create_df(user_preference)
 
-    writer.writerow(Bond.FIELDS)
+    with StringIO() as io:
+        res = {}
 
-    bonds = user_preference.bonds.all().select_related('company')
+        bonds_df.to_json(io, orient='records', date_format='iso', force_ascii=False, default_handler=str)
+        res.update({"Bonds": json.loads(io.getvalue().strip())})
+        io.truncate(0)
+        io.seek(0)
+        shares_df.to_json(io, orient='records', date_format='iso', force_ascii=False, default_handler=str)
+        res.update({"Shares": json.loads(io.getvalue().strip())})
+        io.truncate(0)
+        io.seek(0)
 
-    writer.writerow(['Bonds'])
-    for bond in bonds:
-        writer.writerow(bond.get_fields())
+        json.dump(res, io, indent=4, ensure_ascii=False)
 
-    writer.writerow([])
-
-    writer.writerow(Share.FIELDS)
-
-    shares = user_preference.shares.all().select_related('company')
-
-    writer.writerow(['Shares'])
-    for share in shares:
-        writer.writerow(share.get_fields())
+        response.write(io.getvalue())
 
 
 @dramatiq.actor
@@ -54,20 +50,7 @@ def create_pdf(response, user_preference):
 
 @dramatiq.actor
 def create_excel(response, user_preference):
-    bonds = user_preference.bonds.all().select_related('company')
-    shares = user_preference.shares.all().select_related('company')
-
-    bonds_table = {}
-    for i, key in enumerate(Bond.FIELDS):
-        bonds_table[key] = [bond.get_fields()[i] for bond in bonds]
-
-    bonds_df = pd.DataFrame(bonds_table)
-
-    shares_table = {}
-    for i, key in enumerate(Share.FIELDS):
-        shares_table[key] = [share.get_fields()[i] for share in shares]
-
-    shares_df = pd.DataFrame(shares_table)
+    bonds_df, shares_df = create_df(user_preference)
 
     with BytesIO() as b:
         writer = pd.ExcelWriter(b, engine='xlsxwriter')
