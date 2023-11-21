@@ -1,4 +1,6 @@
-{% extends 'base_user.html' %} {% block content %}
+{% extends 'base_user.html' %}
+{% load static %}
+{% block content %}
 
 <div class="container mt-4">
   <nav aria-label="breadcrumb">
@@ -12,25 +14,41 @@
 
   <div class="card">
     <div class="card-body">
-      <form action="{% url 'create-preference' %}" method="post">
+      <form action="{% url 'create-preference' %}" method="post" enctype="multipart/form-data">
         {% include 'partials/_messages.html'%} {% csrf_token %}
         <div class="form-group">
-          <label>Name</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            name="name"
-          />
+            <label>
+                Name
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  name="name"
+                  required
+                />
+            </label>
         </div>
         <div class="form-group">
-          <label>Description</label>
-          <textarea
-            class="form-control form-control-sm"
-            cols="50"
-            name="description">
-          </textarea>
+            <label>
+                Description
+                <textarea
+                  class="form-control form-control-sm"
+                  cols="50"
+                  name="description"></textarea>
+            </label>
         </div>
-
+        <div class="form-group">
+            <label>
+                Create as import
+                <input type="checkbox" name="import" id="import">
+            </label>
+        </div>
+        <div class="form-group" style="display: none" id="file">
+            <input
+                type="file"
+                name="file"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            />
+        </div>
         <input
           type="submit"
           value="Submit"
@@ -41,4 +59,5 @@
   </div>
 </div>
 
+<script src="{% static 'js/addFile.js' %}"></script>
 {% endblock %}
