@@ -28,7 +28,6 @@ def fetch_shares():
 def processing_shares(fields):
     fields_list = [field.strip("[]'%").replace(' ', '') for field in fields.split(", ")[1:]]
     for i, field in enumerate(fields_list):
-        print(i, fields_list[i])
         if field == '-' or field == '':
             fields_list[i] = None
         elif i in (2, 3, 4, 6, 7, 8, 9, 10, 11):
