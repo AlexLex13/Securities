@@ -24,7 +24,7 @@
         <li class="nav-item text-nowrap">
           <a class="nav-link" href="{% url 'preferences'%}">
             {% if request.user.is_authenticated %}
-              ({{request.user.username}})
+              Profile {{request.user.username}}
             {% endif %}
           </a>
         </li>
