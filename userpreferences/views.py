@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from bonds.models import Bond
 from shares.models import Share
 from .models import UserPreference
-from .tasks import create_csv, create_pdf, create_excel
+from .tasks import create_pdf, create_excel, create_json
 from .utils import parse_bonds_df
 
 
@@ -115,14 +115,14 @@ def delete_share(request, name, share_pk):
     return redirect('preference-details', name)
 
 
-def export_csv(request, name):
-    response = HttpResponse(content_type='text/csv')
+def export_json(request, name):
+    response = HttpResponse(content_type='application/json')
     response['Content-Disposition'] = f'attachment; filename={name}_' + \
-                                      str(datetime.datetime.now()) + '.csv'
+                                      str(datetime.datetime.now()) + '.json'
 
     user_preference = UserPreference.objects.get(user=request.user, name=name)
 
-    create_csv(response, user_preference)
+    create_json(response, user_preference)
 
     return response
 

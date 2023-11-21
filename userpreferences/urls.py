@@ -8,7 +8,7 @@ preference_patterns = [
     path('del', views.delete_preference, name="delete-preference"),
     path('del_bond/<int:bond_pk>', views.delete_bond, name="delete-bond"),
     path('del_share/<int:share_pk>', views.delete_share, name="delete-share"),
-    path('export_csv', views.export_csv, name="export-csv"),
+    path('export_json', views.export_json, name="export-json"),
     path('export_pdf', views.export_pdf, name="export-pdf"),
     path('export_excel', views.export_excel, name="export-excel"),
 ]

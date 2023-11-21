@@ -8,6 +8,7 @@
   <div class="row-cols-1">
     <div style="display:inline;">
       <a href="{% url 'export-excel' name %}" class="btn btn-primary">Export Excel</a>
+      <a href="{% url 'export-json' name %}" class="btn btn-info">Export JSON</a>
       <a href="{% url 'export-pdf' name %}" class="btn btn-secondary">Create report</a>
     </div>
   </div>
@@ -17,7 +18,6 @@
     <div class="row-cols-1">
         <div style="display:inline;">
           <a href="{% url 'bonds' %}" class="btn btn-light">Add more bonds</a>
-          <a href="{% url 'export-csv' name %}" class="btn btn-light">Export CSV</a>
         </div>
     </div>
     <br>
@@ -83,7 +83,6 @@
     <div class="row-cols-1">
         <div style="display:inline;">
           <a href="{% url 'shares' %}" class="btn btn-light">Add more shares</a>
-          <a href="{% url 'export-csv' name %}" class="btn btn-light">Export CSV</a>
         </div>
     </div>
     <br>
