@@ -1,10 +1,13 @@
 from django.db import models
 from djmoney.models.fields import MoneyField
+from pytils.translit import slugify
+
 from companies.models import Company
 
 
 class Bond(models.Model):
     name = models.CharField(max_length=256)
+    slug = models.SlugField()
     maturity_years = models.FloatField()
     profitability = models.FloatField()
     coupon_yield = models.FloatField()
@@ -40,6 +43,10 @@ class Bond(models.Model):
             self.price, self.next_coupon_date, self.issue_date,
             self.maturity_date, self.offer_date, self.company.name
         ]
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
