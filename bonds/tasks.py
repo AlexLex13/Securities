@@ -24,8 +24,10 @@ def fetch_bonds():
 
     for i in range(1, 42):
         bond_fields = []
-        for j in (0, 1, *list(range(3, 18))):
+        for j in (1, *list(range(3, 18))):
             bond_fields.append(bs.find('tbody').find_all('tr')[i].find_all('td')[j].text.strip())
+        bond_fields.append(' '.join(bs.find('tbody').find_all('tr')[i].find_all('td')[2].find('a').get('title')
+                                     .split()[2:]))
         bonds.append(bond_fields)
 
     return bonds
@@ -33,7 +35,7 @@ def fetch_bonds():
 
 @dramatiq.actor
 def processing_bonds(fields):
-    fields_list = [field.strip("[]'%") for field in fields.split(", ")[1:]]
+    fields_list = [field.strip("[]'%") for field in fields.split(", ")]
     for i, field in enumerate(fields_list):
         if field == '-':
             fields_list[i] = None
