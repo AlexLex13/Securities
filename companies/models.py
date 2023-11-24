@@ -4,9 +4,9 @@ from djmoney.models.fields import MoneyField
 
 class Company(models.Model):
     name = models.CharField(max_length=256)
-    country = models.CharField(max_length=256)
-    industry = models.CharField(max_length=256)
-    share_capital = MoneyField(max_digits=16, decimal_places=2, default_currency='USD')
+    country = models.CharField(max_length=256, null=True, blank=True)
+    industry = models.CharField(max_length=256, null=True, blank=True)
+    share_capital = MoneyField(max_digits=16, decimal_places=2, default_currency='USD', null=True, blank=True)
     stock_market = models.CharField(max_length=256, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     website = models.CharField(max_length=256, null=True, blank=True)
@@ -23,10 +23,10 @@ class Company(models.Model):
 
 class Broker(models.Model):
     name = models.CharField(max_length=255)
-    active_clients_number = models.PositiveIntegerField()
+    active_clients_number = models.PositiveIntegerField(null=True, blank=True)
     stock_market = models.CharField(max_length=256, null=True, blank=True)
-    trading_turnover = MoneyField(max_digits=16, decimal_places=2, default_currency='USD')
-    equity_capital = MoneyField(max_digits=16, decimal_places=2, default_currency='USD')
+    trading_turnover = MoneyField(max_digits=16, decimal_places=2, default_currency='USD', null=True, blank=True)
+    equity_capital = MoneyField(max_digits=16, decimal_places=2, default_currency='USD', null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     website = models.CharField(max_length=256, null=True, blank=True)
 
