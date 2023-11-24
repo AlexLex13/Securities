@@ -54,13 +54,11 @@
     </thead>
 
     <tbody>
-      {% for bond in page_obj%}
+      {% for bond in page_obj %}
       <tr>
         <td>{{ forloop.counter }}</td>
         {% for field in bond%}
-            {% if forloop.last %}
-                <td><a href="#">{{field}}</a></td>
-            {% else %}
+            {% if not forloop.last %}
                 <td>{{field}}</td>
             {% endif %}
         {% endfor %}
@@ -76,7 +74,7 @@
           </button>
           <dialog id="Dialog_{{forloop.counter}}">
             <div class="container">
-              <form action="{% url 'add-bond' bond.0 %}" method="post">
+              <form action="{% url 'add-bond' bond.17 %}" method="post">
                 {% csrf_token %}
                 <h5 id="title_{{forloop.counter}}">Choose a set:</h5>
                 <select name="ref_name" id="sel_{{forloop.counter}}" class="d-block form-select form-select-lg mb-3"></select>

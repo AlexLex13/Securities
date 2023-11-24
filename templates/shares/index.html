@@ -53,11 +53,7 @@
       <tr>
         <td>{{ forloop.counter }}</td>
         {% for field in share %}
-            {% if forloop.last %}
-                <td><a href="#">{{field}}</a></td>
-            {% else %}
-                <td>{{field}}</td>
-            {% endif %}
+            <td>{{field}}</td>
         {% endfor %}
         <td>
           <button type="button"
