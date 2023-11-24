@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'bonds' %}">Bonds</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <a href="{% url 'shares' %}">Shares</a>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    {% include 'partials/_messages.html' %}
+
+    <div class="row">
+      <div class="col-md-10">
+        <div class="form-group">
+          <input type="text" class="form-control" id="searchField" placeholder="Search">
+        </div>
+      </div>
+    </div>
+<div class="app-table">
+  <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:11.5px;">
+    <thead class="thead-light">
+      <tr>
+        <th>№</th>
+        <th>Name</th>
+        <th>country</th>
+        <th>industry</th>
+        <th>share_capital</th>
+        <th>stock_market</th>
+        <th>description</th>
+        <th>website</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for company in companies %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ company.name }}</td>
+            <td>{{ company.country }}</td>
+            <td>{{ company.industry }}</td>
+            <td>{{ company.share_capital }}</td>
+            <td>{{ company.stock_market }}</td>
+            <td>{{ company.description }}</td>
+            {% if company.website %}
+                <td><a class="nav-link" href="{{ company.website }}">{{ company.website }}</a></td>
+            {% else %}
+                <td></td>
+            {%  endif %}
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+  <div class="pagination-container">
+    <div class="">
+      Showing page {{page_obj.number}} of {{ page_obj.paginator.num_pages }}
+    </div>
+    <ul class="pagination align-right float-right mr-auto">
+      {% if page_obj.has_previous %}
+      <li {% if page_obj.number == 1 %} class="page-item active" {% endif %}><a class="page-link" href="?page=1">&laquo; 1</a></li>
+      <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% endif %}
+
+      {% if page_obj.has_next %}
+      <li class="page-item"> <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages}} &raquo;</a></li>
+      {% endif %}
+      </ul>
+  </div>
+</div>
+</div>
+{% endblock %}
