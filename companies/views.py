@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from django.views.generic import ListView
 
-# Create your views here.
+from companies.models import Company
+
+
+class CompaniesView(ListView):
+    template_name = 'companies/index.html'
+    context_object_name = 'companies'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Company.objects.all()
