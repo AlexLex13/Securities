@@ -3,6 +3,7 @@ import datetime
 import dramatiq
 import requests
 from bs4 import BeautifulSoup
+from pytils.translit import slugify
 
 
 @dramatiq.actor
@@ -24,6 +25,7 @@ def fetch_bonds():
                 bond_fields.append(bs.find('tbody').find_all('tr')[i].find_all('td')[j].text.strip())
 
             bond_fields.append(' '.join(company_title.get('title').split()[2:]))
+            bond_fields.append(slugify(bond_fields[0]))
 
         else:
             continue

@@ -45,18 +45,18 @@ def add_bond(request, bond_name):
 
         selected_preference = preferences.get(name=name)
 
-        if len(selected_preference.bonds.filter(name=bond_name)):
+        if len(selected_preference.bonds.filter(slug=bond_name)):
             messages.info(request, f'The bond has already been added to set "{name}"')
             return redirect('bonds')
 
         bond_fields = processing_bonds(request.POST['fields'])
-        dct = dict(zip(Bond.FIELDS, bond_fields[:-1]))
+        dct = dict(zip(Bond.FIELDS, bond_fields[:-2]))
 
-        if len(Bond.objects.filter(name=bond_name)):
-            Bond.objects.filter(name=bond_name).update(**dct)
+        if len(Bond.objects.filter(slug=bond_name)):
+            Bond.objects.filter(slug=bond_name).update(**dct)
             return redirect('bonds')
 
-        company = Company.objects.update_or_create(name=bond_fields[-1])
+        company = Company.objects.update_or_create(name=bond_fields[-2])
 
         bond = Bond(**dct, company=company[0])
         bond.save()
