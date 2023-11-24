@@ -3,7 +3,6 @@ import datetime
 import dramatiq
 import requests
 from bs4 import BeautifulSoup
-from requests.exceptions import ConnectTimeout
 
 
 @dramatiq.actor
@@ -11,23 +10,24 @@ def fetch_bonds():
     url = 'https://smart-lab.ru/q/bonds/'
     headers = {'Content-Type': 'text/html'}
 
-    response = None
-    while not response:
-        try:
-            response = requests.get(url, headers=headers)
-        except ConnectTimeout:
-            pass
-
-    bonds = []
-
+    response = requests.get(url, headers=headers)
     bs = BeautifulSoup(response.text, 'lxml')
 
+    bonds = []
     for i in range(1, 42):
+        company_title = bs.find('tbody').find_all('tr')[i].find_all('td')[2].find('a')
         bond_fields = []
-        for j in (1, *list(range(3, 18))):
-            bond_fields.append(bs.find('tbody').find_all('tr')[i].find_all('td')[j].text.strip())
-        bond_fields.append(' '.join(bs.find('tbody').find_all('tr')[i].find_all('td')[2].find('a').get('title')
-                                     .split()[2:]))
+
+        if company_title:
+
+            for j in (1, *list(range(3, 18))):
+                bond_fields.append(bs.find('tbody').find_all('tr')[i].find_all('td')[j].text.strip())
+
+            bond_fields.append(' '.join(company_title.get('title').split()[2:]))
+
+        else:
+            continue
+
         bonds.append(bond_fields)
 
     return bonds
