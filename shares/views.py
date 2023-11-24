@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import ListView
 
+from companies.models import Company
 from userpreferences.models import UserPreference
 from .models import Share
 from .tasks import fetch_shares, processing_shares
@@ -50,9 +51,15 @@ def add_share(request, ticker):
             return redirect('shares')
 
         share_fields = processing_shares(request.POST['fields'])
+        dct = dict(zip(Share.FIELDS, share_fields[:-1]))
 
-        dct = dict(zip(Share.FIELDS, share_fields))
-        share = Share(**dct, company_id=1)
+        if len(Share.objects.filter(ticker=ticker)):
+            Share.objects.filter(ticker=ticker).update(**dct)
+            return redirect('shares')
+
+        company = Company.objects.update_or_create(name=share_fields[-1])
+
+        share = Share(**dct, company=company[0])
         share.save()
 
         selected_preference.shares.add(share)

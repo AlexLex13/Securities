@@ -51,38 +51,38 @@
     <tbody>
       {% for share in shares %}
       <tr>
+        <td>{{ forloop.counter }}</td>
         {% for field in share %}
-        <td>{{field}}</td>
+            <td>{{field}}</td>
         {% endfor %}
-        <td></td>
         <td>
           <button type="button"
                   class="btn btn-secondary btn-sm"
-                  onclick="window.Dialog_{{share.0}}.showModal();load('{{share.0}}')"
+                  onclick="window.Dialog_{{forloop.counter}}.showModal();load('{{forloop.counter}}')"
                   {% if not request.user.is_authenticated %}
                     title="Log in into your account!"
                     disabled
                   {% endif %}
             >Add
           </button>
-          <dialog id="Dialog_{{share.0}}">
+          <dialog id="Dialog_{{forloop.counter}}">
             <div class="container">
-              <form action="{% url 'add-share' share.2 %}" method="post">
+              <form action="{% url 'add-share' share.1 %}" method="post">
                 {% csrf_token %}
-                <h5 id="title_{{share.0}}">Choose a set:</h5>
-                <select name="ref_name" id="sel_{{share.0}}" class="d-block form-select form-select-lg mb-3"></select>
+                <h5 id="title_{{forloop.counter}}">Choose a set:</h5>
+                <select name="ref_name" id="sel_{{forloop.counter}}" class="d-block form-select form-select-lg mb-3"></select>
                 <input type="submit"
                        value="Add"
                        class="d-block btn btn-primary btn-primary-sm"
-                       id="submit_{{share.0}}"
+                       id="submit_{{forloop.counter}}"
                 />
                 <input type="hidden"
                        name="fields"
-                       value="{{ share }}"
+                       value="{{share}}"
                 />
                 <button type="button"
                         class="d-block btn btn-secondary btn-secondary-sm"
-                        onclick="window.Dialog_{{share.0}}.close()"
+                        onclick="window.Dialog_{{forloop.counter}}.close()"
                 >Cancel
                 </button>
               </form>
