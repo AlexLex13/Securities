@@ -33,11 +33,6 @@
       <tr>
         <th>№</th>
         <th>Name</th>
-        <th>country</th>
-        <th>industry</th>
-        <th>share_capital</th>
-        <th>stock_market</th>
-        <th>description</th>
         <th>website</th>
       </tr>
     </thead>
@@ -46,14 +41,9 @@
       {% for company in companies %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ company.name }}</td>
-            <td>{{ company.country }}</td>
-            <td>{{ company.industry }}</td>
-            <td>{{ company.share_capital }}</td>
-            <td>{{ company.stock_market }}</td>
-            <td>{{ company.description }}</td>
+            <td><a href="{% url 'company_details' company.slug %}">{{ company.name }}</a></td>
             {% if company.website %}
-                <td><a class="nav-link" href="{{ company.website }}">{{ company.website }}</a></td>
+                <td><a href="{{ company.website }}">{{ company.website }}</a></td>
             {% else %}
                 <td></td>
             {%  endif %}

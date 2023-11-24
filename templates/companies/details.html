@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'bonds' %}">Bonds</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <a href="{% url 'shares' %}">Shares</a>
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    {% include 'partials/_messages.html' %}
+
+    <div class="display-1">
+        <div>
+            <h6>Name</h6>
+            <p>{{ company.name }}</p>
+        </div>
+        <div>
+            <h6>Country</h6>
+            <p>{{ company.country }}</p>
+        </div>
+        <div>
+            <h6>Industry</h6>
+            <p>{{ company.industry }}</p>
+        </div>
+        <div>
+            <h6>Share capital</h6>
+            <p>{{ company.share_capital }}</p>
+        </div>
+        <div>
+            <h6>Stock market</h6>
+            <p>{{ company.stock_market }}</p>
+        </div>
+        <div>
+            <h6>Description</h6>
+            <p>{{ company.description }}</p>
+        </div>
+        {% if company.website %}
+            <div>
+                <h3>Website</h3>
+                <p><a href="{{ company.website }}">{{ company.website }}</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

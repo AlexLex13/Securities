@@ -1,4 +1,4 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from companies.models import Company
 
@@ -10,3 +10,9 @@ class CompaniesView(ListView):
 
     def get_queryset(self):
         return Company.objects.all()
+
+
+class CompanyDetailView(DetailView):
+    model = Company
+    template_name = 'companies/details.html'
+    context_object_name = 'company'
