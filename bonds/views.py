@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
+from companies.models import Company
 from userpreferences.models import UserPreference
 from .models import Bond
 from .tasks import fetch_bonds, processing_bonds
@@ -49,9 +50,15 @@ def add_bond(request, bond_name):
             return redirect('bonds')
 
         bond_fields = processing_bonds(request.POST['fields'])
+        dct = dict(zip(Bond.FIELDS, bond_fields[:-1]))
 
-        dct = dict(zip(Bond.FIELDS, bond_fields))
-        bond = Bond(**dct, company_id=1)
+        if len(Bond.objects.filter(name=bond_name)):
+            Bond.objects.filter(name=bond_name).update(**dct)
+            return redirect('bonds')
+
+        company = Company.objects.update_or_create(name=bond_fields[-1])
+
+        bond = Bond(**dct, company=company[0])
         bond.save()
 
         selected_preference.bonds.add(bond)
