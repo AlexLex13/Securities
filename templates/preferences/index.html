@@ -28,11 +28,11 @@
     <tbody>
       {% for pref in page_obj%}
       <tr>
-        <td><a href="{% url 'preference-details' pref.name %}">{{pref.name}}</a></td>
+        <td><a href="{% url 'preference-details' pref.slug %}">{{pref.name}}</a></td>
         <td>{{pref.description}}</td>
 
         <td>
-          <a href="{% url 'delete-preference' pref.name %}"
+          <a href="{% url 'delete-preference' pref.slug %}"
             class="btn btn-secondary btn-sm"
             >Delete</a
           >

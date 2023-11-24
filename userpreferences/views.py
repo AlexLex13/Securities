@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import pandas
 from django.contrib import messages
@@ -8,6 +9,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bonds.models import Bond
+from companies.models import Company
 from shares.models import Share
 from .models import UserPreference
 from .tasks import create_pdf, create_excel, create_json
@@ -50,13 +52,20 @@ def create_preference(request):
         if request.POST.getlist('import'):
             file = request.FILES['file']
             if file.content_type.endswith('sheet'):
-                df = pandas.read_excel(file, 'Bonds')
+                bonds_df = pandas.read_excel(file, 'Bonds')
+                bonds_list = parse_bonds_df(bonds_df)
+            if file.content_type.endswith('json'):
+                ct = json.load(file)
+                bonds_list = ct['Bonds']
 
-            bonds_list = parse_bonds_df(df)
             for bond_fields in bonds_list:
-                dct = dict(zip(Bond.FIELDS, bond_fields))
-                bond = Bond(**dct, company_id=1)
+                dct = dict(zip(Bond.FIELDS, bond_fields[:-1]))
+
+                company = Company.objects.update_or_create(name=bond_fields[-1])
+
+                bond = Bond(**dct, company=company[0])
                 bond.save()
+
                 user_preference.bonds.add(bond)
 
         messages.success(request, f'Set "{name}" has been successfully created')
@@ -65,7 +74,7 @@ def create_preference(request):
 
 @login_required(login_url='/authentication/login')
 def delete_preference(request, name):
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
     for bond in user_preference.bonds.all():
         Bond.objects.get(name=bond.name).delete()
@@ -81,7 +90,7 @@ def delete_preference(request, name):
 
 @login_required(login_url='/authentication/login')
 def preference_details(request, name):
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
     context = {
         'name': name,
@@ -95,7 +104,7 @@ def preference_details(request, name):
 def delete_bond(request, name, bond_pk):
     bond = Bond.objects.get(pk=bond_pk)
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
     user_preference.bonds.remove(bond)
     bond.delete()
 
@@ -107,7 +116,7 @@ def delete_bond(request, name, bond_pk):
 def delete_share(request, name, share_pk):
     share = Share.objects.get(pk=share_pk)
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
     user_preference.shares.remove(share)
     share.delete()
 
@@ -120,7 +129,7 @@ def export_json(request, name):
     response['Content-Disposition'] = f'attachment; filename={name}_' + \
                                       str(datetime.datetime.now()) + '.json'
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
     create_json(response, user_preference)
 
@@ -133,7 +142,7 @@ def export_pdf(request, name):
                                       str(datetime.datetime.now()) + '.pdf'
     response['Content-Transfer-Encoding'] = 'binary'
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
     create_pdf(response, user_preference)
 
@@ -145,7 +154,7 @@ def export_excel(request, name):
     response['Content-Disposition'] = f'attachment; filename={name}_' + \
                                       str(datetime.datetime.now()) + '.xlsx'
 
-    user_preference = UserPreference.objects.get(user=request.user, name=name)
+    user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
     create_excel(response, user_preference)
 

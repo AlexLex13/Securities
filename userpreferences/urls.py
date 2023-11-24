@@ -17,5 +17,5 @@ urlpatterns = [
     path('', views.index, name="preferences"),
     path('add', views.create_preference, name="create-preference"),
     path('show', csrf_exempt(views.show_user_preferences), name="show-user-preferences"),
-    path('<str:name>/', include(preference_patterns)),
+    path('<slug:name>/', include(preference_patterns)),
 ]
