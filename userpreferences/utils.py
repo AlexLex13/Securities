@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pandas as pd
 
 from bonds.models import Bond
@@ -23,16 +25,29 @@ def create_df(preference):
     return bonds_df, shares_df
 
 
-def parse_bonds_df(df):
+def parse_bonds_json(lst):
     bonds = []
-    for lst in df.values:
-        field_list = lst[1:-1]
-        for i, f in enumerate(field_list):
-           if i in (6, 7, 9, 11):
-               field_list[i] = float(f.strip('$'))
-           if i in range(12, 16):
-               field_list[i] = f.date()
+    for dct in lst:
+        for k, v in dct.items():
+            if dct[k]:
+                if k in ('volume', 'coupon_value', 'price', 'accumulated_income'):
+                   dct[k] = float(v.strip('$').replace(',', ''))
+                if k in ('next_coupon_date', 'issue_date', 'maturity_date', 'offer_date'):
+                   dct[k] = datetime.strptime(v[:10], '%Y-%m-%d').date()
 
-        bonds.append(field_list)
-
+        bonds.append(dct)
     return bonds
+
+
+def parse_shares_json(lst):
+    shares = []
+    for dct in lst:
+        for k, v in dct.items():
+            if dct[k]:
+                if k in ('last_price', 'volume', 'capitalization'):
+                    dct[k] = float(v.strip('$').replace(',', ''))
+                if k == 'last_transaction_time':
+                    datetime.strptime(v, '%H:%M:%S').time()
+
+        shares.append(dct)
+    return shares
