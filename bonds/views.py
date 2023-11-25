@@ -58,9 +58,8 @@ def add_bond(request, bond_name):
 
         company = Company.objects.update_or_create(name=bond_fields[-2])
 
-        bond = Bond(**dct, company=company[0])
-        bond.save()
+        bond = Bond.objects.update_or_create(**dct, company=company[0])
+        selected_preference.bonds.add(bond[0])
 
-        selected_preference.bonds.add(bond)
         messages.success(request, f'The bond has been successfully added to set "{name}"')
         return redirect('bonds')

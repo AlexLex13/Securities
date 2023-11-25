@@ -59,9 +59,8 @@ def add_share(request, ticker):
 
         company = Company.objects.update_or_create(name=share_fields[-1])
 
-        share = Share(**dct, company=company[0])
-        share.save()
+        share = Share.objects.update_or_create(**dct, company=company[0])
+        selected_preference.shares.add(share[0])
 
-        selected_preference.shares.add(share)
         messages.success(request, f'The share has been successfully added to set "{name}"')
         return redirect('shares')
