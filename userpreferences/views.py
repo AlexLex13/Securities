@@ -1,7 +1,8 @@
 import datetime
 import json
+from io import StringIO
 
-import pandas
+import pandas as pd
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -13,7 +14,7 @@ from companies.models import Company
 from shares.models import Share
 from .models import UserPreference
 from .tasks import create_pdf, create_excel, create_json
-from .utils import parse_bonds_df
+from .utils import parse_bonds_json, parse_shares_json
 
 
 @login_required(login_url='/authentication/login')
@@ -52,21 +53,38 @@ def create_preference(request):
         if request.POST.getlist('import'):
             file = request.FILES['file']
             if file.content_type.endswith('sheet'):
-                bonds_df = pandas.read_excel(file, 'Bonds')
-                bonds_list = parse_bonds_df(bonds_df)
+                bonds_df = pd.read_excel(file, 'Bonds', usecols=Bond.FIELDS)
+                shares_df = pd.read_excel(file, 'Shares', usecols=Share.FIELDS)
+
+                with StringIO() as io:
+                    bonds_df.to_json(io, orient='records', date_format='iso', force_ascii=False, default_handler=str)
+                    bonds_list = parse_bonds_json(json.loads(io.getvalue().strip()))
+                    io.truncate(0)
+                    io.seek(0)
+
+                    shares_df.to_json(io, orient='records', date_format='iso', force_ascii=False, default_handler=str)
+                    shares_list = parse_shares_json(json.loads(io.getvalue().strip()))
+                    io.truncate(0)
+                    io.seek(0)
+
             if file.content_type.endswith('json'):
                 ct = json.load(file)
-                bonds_list = ct['Bonds']
+                bonds_list = parse_bonds_json(ct['Bonds'])
+                shares_list = parse_shares_json(ct['Shares'])
 
             for bond_fields in bonds_list:
-                dct = dict(zip(Bond.FIELDS, bond_fields[:-1]))
+                company = bond_fields.pop('company')
 
-                company = Company.objects.update_or_create(name=bond_fields[-1])
+                bond = Bond.objects.update_or_create(**bond_fields, company=Company.objects.get(name=company))
 
-                bond = Bond(**dct, company=company[0])
-                bond.save()
+                user_preference.bonds.add(bond[0])
 
-                user_preference.bonds.add(bond)
+            for share_fields in shares_list:
+                company = share_fields.pop('company')
+
+                share = Share.objects.update_or_create(**share_fields, company=Company.objects.get(name=company))
+
+                user_preference.shares.add(share[0])
 
         messages.success(request, f'Set "{name}" has been successfully created')
         return redirect('preferences')
