@@ -19,9 +19,13 @@
   <table class="table table-stripped table-hover table-sm table-bordered">
     <thead class="thead-light">
       <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th></th>
+        {% if page_obj %}
+            <th>Name</th>
+            <th>Description</th>
+            <th></th>
+        {% else %}
+            <h5>There is not a single dataset yet!</h5>
+        {% endif %}
       </tr>
     </thead>
 

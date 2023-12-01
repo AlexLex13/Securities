@@ -24,24 +24,28 @@
     <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:11.5px;">
       <thead class="thead-light">
         <tr>
-          <th>Name</th>
-          <th>maturity_years</th>
-          <th>profitability</th>
-          <th>coupon_yield</th>
-          <th>coupon_yield_last</th>
-          <th>rating</th>
-          <th>volume</th>
-          <th>coupon_value</th>
-          <th>coupon_payments_frequency</th>
-          <th>accumulated_income</th>
-          <th>duration</th>
-          <th>price</th>
-          <th>next_coupon_date</th>
-          <th>issue_date</th>
-          <th>maturity_date</th>
-          <th>offer_date</th>
-          <th>company</th>
-          <th></th>
+          {% if bonds %}
+              <th>Name</th>
+              <th>maturity_years</th>
+              <th>profitability</th>
+              <th>coupon_yield</th>
+              <th>coupon_yield_last</th>
+              <th>rating</th>
+              <th>volume</th>
+              <th>coupon_value</th>
+              <th>coupon_payments_frequency</th>
+              <th>accumulated_income</th>
+              <th>duration</th>
+              <th>price</th>
+              <th>next_coupon_date</th>
+              <th>issue_date</th>
+              <th>maturity_date</th>
+              <th>offer_date</th>
+              <th>company</th>
+              <th></th>
+          {% else %}
+              <h5>There are no bonds yet!</h5>
+          {% endif %}
         </tr>
       </thead>
 
@@ -89,19 +93,23 @@
       <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>ticker</th>
-            <th>last_price</th>
-            <th>price_change</th>
-            <th>volume</th>
-            <th>last_transaction_time</th>
-            <th>weekly_price_change</th>
-            <th>monthly_price_change</th>
-            <th>annual_price_change</th>
-            <th>capitalization</th>
-            <th>volume_change</th>
-            <th>company</th>
-            <th></th>
+            {% if shares %}
+                <th>Name</th>
+                <th>ticker</th>
+                <th>last_price</th>
+                <th>price_change</th>
+                <th>volume</th>
+                <th>last_transaction_time</th>
+                <th>weekly_price_change</th>
+                <th>monthly_price_change</th>
+                <th>annual_price_change</th>
+                <th>capitalization</th>
+                <th>volume_change</th>
+                <th>company</th>
+                <th></th>
+            {% else %}
+                <h5>There are no shares yet!</h5>
+            {% endif %}
           </tr>
         </thead>
 
