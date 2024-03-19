@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
 from companies.models import Company, Broker
@@ -28,3 +27,8 @@ class BrokersView(ListView):
     def get_queryset(self):
         return fetch_brokers()
 
+
+class BrokerDetailView(DetailView):
+    model = Broker
+    template_name = 'companies/bk_details.html'
+    context_object_name = 'broker'
