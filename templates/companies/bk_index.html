@@ -50,39 +50,42 @@
       {% for broker in brokers %}
       <tr>
         <td>{{ forloop.counter }}</td>
-        {% for field in broker %}
-            <td>{{field}}</td>
-        {% endfor %}
+        <td><a href="{% url 'broker_details' broker.slug %}">{{ broker.name }}</a></td>
+        {% if company.website %}
+            <td><a href="{{ company.website }}">{{ company.website }}</a></td>
+        {% else %}
+            <td></td>
+        {% endif %}
       </tr>
     {% endfor %}
     </tbody>
   </table>
 </div>
 
-<p class="no-results" style="display: none;">No results </p>
-    <div class="table-output">
-      <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
-        <thead>
-          <tr>
-            <th>Namess
-            <th>ticker</th>
-            <th>last_price</th>
-            <th>price_change</th>
-            <th>volume</th>
-            <th>last_transaction_time</th>
-            <th>weekly_price_change</th>
-            <th>monthly_price_change</th>
-            <th>annual_price_change</th>
-            <th>capitalization</th>
-            <th>volume_change</th>
-            <th>company</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody  class="table-body">
-        </tbody>
-      </table>
-    </div>
+{#<p class="no-results" style="display: none;">No results </p>#}
+{#    <div class="table-output">#}
+{#      <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">#}
+{#        <thead>#}
+{#          <tr>#}
+{#            <th>Namess#}
+{#            <th>ticker</th>#}
+{#            <th>last_price</th>#}
+{#            <th>price_change</th>#}
+{#            <th>volume</th>#}
+{#            <th>last_transaction_time</th>#}
+{#            <th>weekly_price_change</th>#}
+{#            <th>monthly_price_change</th>#}
+{#            <th>annual_price_change</th>#}
+{#            <th>capitalization</th>#}
+{#            <th>volume_change</th>#}
+{#            <th>company</th>#}
+{#            <th></th>#}
+{#          </tr>#}
+{#        </thead>#}
+{#        <tbody  class="table-body">#}
+{#        </tbody>#}
+{#      </table>#}
+{#    </div>#}
 
       <div class="pagination-container">
       <div class="">
