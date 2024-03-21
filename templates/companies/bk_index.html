@@ -59,50 +59,23 @@
   </table>
 </div>
 
-<p class="no-results" style="display: none;">No results </p>
-    <div class="table-output">
-      <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
-        <thead>
-          <tr>
-            <th>Namess
-            <th>ticker</th>
-            <th>last_price</th>
-            <th>price_change</th>
-            <th>volume</th>
-            <th>last_transaction_time</th>
-            <th>weekly_price_change</th>
-            <th>monthly_price_change</th>
-            <th>annual_price_change</th>
-            <th>capitalization</th>
-            <th>volume_change</th>
-            <th>company</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody  class="table-body">
-        </tbody>
-      </table>
-    </div>
+<div class="pagination-container">
+<div class="">
+Showing page {{page_obj.number}} of {{ page_obj.paginator.num_pages }}
+</div>
+<ul class="pagination align-right float-right mr-auto">
+{% if page_obj.has_previous %}
+<li {% if page_obj.number == 1 %} class="page-item active" {% endif %}><a class="page-link" href="?page=1">&laquo; 1</a></li>
+<li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+{% endif %}
 
-      <div class="pagination-container">
-      <div class="">
-        Showing page {{page_obj.number}} of {{ page_obj.paginator.num_pages }}
-      </div>
-      <ul class="pagination align-right float-right mr-auto">
-        {% if page_obj.has_previous %}
-        <li {% if page_obj.number == 1 %} class="page-item active" {% endif %}><a class="page-link" href="?page=1">&laquo; 1</a></li>
-        <li class="page-item"> <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-        {% endif %}
-
-        {% if page_obj.has_next %}
-        <li class="page-item"> <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-        <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages}} &raquo;</a></li>
-        {% endif %}
-        </ul>
-    </div>
+{% if page_obj.has_next %}
+<li class="page-item"> <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+<li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages}} &raquo;</a></li>
+{% endif %}
+</ul>
+</div>
 
 </div>
 </div>
-<script src="{% static 'js/searchShares.js' %}"></script>
-<script src="{% static 'js/loadPrefs.js' %}"></script>
 {% endblock %}

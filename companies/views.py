@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView
 
-from companies.models import Company, Broker
+from companies.models import Company
 from companies.tasks import fetch_brokers
 
 
@@ -26,9 +26,3 @@ class BrokersView(ListView):
 
     def get_queryset(self):
         return fetch_brokers()
-
-
-class BrokerDetailView(DetailView):
-    model = Broker
-    template_name = 'companies/bk_details.html'
-    context_object_name = 'broker'
