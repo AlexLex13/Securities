@@ -177,3 +177,10 @@ def export_excel(request, name):
     create_excel(response, user_preference)
 
     return response
+
+
+@login_required(login_url='/authentication/login')
+def exchange(request):
+    if request.method == 'GET':
+        return render(request, 'preferences/exchange.html')
+

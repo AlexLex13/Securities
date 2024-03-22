@@ -13,8 +13,14 @@ preference_patterns = [
     path('export_excel', views.export_excel, name="export-excel"),
 ]
 
+exchange_patterns = [
+    path('', views.exchange, name="exchange"),
+
+]
+
 urlpatterns = [
     path('', views.index, name="preferences"),
+    path('exchange/', include(exchange_patterns)),
     path('add', views.create_preference, name="create-preference"),
     path('show', csrf_exempt(views.show_user_preferences), name="show-user-preferences"),
     path('<slug:name>/', include(preference_patterns)),
