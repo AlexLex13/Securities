@@ -3,7 +3,7 @@ function load(name) {
     const select = document.querySelector("#sel_" + name);
     const submit = document.querySelector("#submit_" + name);
 
-    if (select.innerHTML == "") {
+    if (select.innerHTML === "") {
       fetch("/preferences/show", {
         method: "GET",
       })

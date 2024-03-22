@@ -1,0 +1,63 @@
+{% extends 'base_user.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'preferences' %}">Preferences</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Create set</li>
+    </ol>
+  </nav>
+
+  <div class="card">
+    <div class="card-body">
+      <form action="{% url 'create-preference' %}" method="post" enctype="multipart/form-data">
+        {% include 'partials/_messages.html'%} {% csrf_token %}
+        <div class="form-group">
+            <label>
+                Name
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  name="name"
+                  required
+                />
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                Description
+                <textarea
+                  class="form-control form-control-sm"
+                  cols="50"
+                  name="description"></textarea>
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                Create as import
+                <input type="checkbox" name="import" id="import">
+            </label>
+        </div>
+        <div class="form-group" style="display: none" id="file">
+            <input
+                type="file"
+                name="file"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json"
+            />
+        </div>
+        <input
+          type="submit"
+          value="Submit"
+          class="btn btn-primary btn-primary-sm"
+        />
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/addFile.js' %}"></script>
+{% endblock %}
