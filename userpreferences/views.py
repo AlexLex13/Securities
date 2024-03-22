@@ -182,5 +182,19 @@ def export_excel(request, name):
 @login_required(login_url='/authentication/login')
 def exchange(request):
     if request.method == 'GET':
-        return render(request, 'preferences/exchange.html')
+        return render(request, 'preferences/exchange/index.html')
 
+
+@login_required(login_url='/authentication/login')
+def send_preference(request):
+    if request.method == 'GET':
+        return render(request, 'preferences/exchange/send.html')
+
+    if request.method == 'POST':
+        sender_name = request.POST['sender_name']
+        name = request.POST['name']
+        description = request.POST['description']
+        pref = request.POST['pref_name']
+        print(sender_name, name, description, pref)
+
+        return redirect('exchange')
