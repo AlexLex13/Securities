@@ -1,4 +1,6 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
@@ -11,8 +13,10 @@ redis_exchange = getattr(settings, 'EXCHANGE')
 
 @login_required(login_url='/authentication/login')
 def exchange(request):
-    arr = []
-    arr.append(redis_exchange.hgetall(request.user.username))
+    arr = redis_exchange.json().get(request.user.username)
+
+    if not arr:
+        arr = []
 
     paginator = Paginator(arr, 5)
     page_number = request.GET.get('page')
@@ -30,17 +34,27 @@ def send_preference(request):
 
     if request.method == 'POST':
         name = request.POST['name']
-        sender_name = request.POST['sender_name']
+        if not User.objects.filter(username=name).exists():
+            messages.error(request, f"User {name} doesn't exists!")
+            return redirect('exchange')
+
         description = request.POST['description']
         pref = request.POST['pref_name']
-        print(sender_name, name, description, pref)
 
         preference = UserPreference.objects.get(user=request.user, name=pref)
 
-        redis_exchange.hset(name, mapping={
-            "sender": sender_name,
+        if not redis_exchange.json().get(name):
+            redis_exchange.json().set(name, '$', [])
+
+        redis_exchange.json().arrappend(name, '$', {
+            "sender": request.user.username,
             "description": description,
             "pref": create_json(preference)
         })
 
         return redirect('exchange')
+
+
+@login_required(login_url='/authentication/login')
+def del_pref_from_inbox(request):
+    pass
