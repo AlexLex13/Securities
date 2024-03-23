@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 
+from exchange.urls import exchange_patterns
 from . import views
 from django.urls import path, include
 
@@ -11,11 +12,6 @@ preference_patterns = [
     path('export_json', views.export_json, name="export-json"),
     path('export_pdf', views.export_pdf, name="export-pdf"),
     path('export_excel', views.export_excel, name="export-excel"),
-]
-
-exchange_patterns = [
-    path('', views.exchange, name="exchange"),
-    path('send/', views.send_preference, name="send_pref"),
 ]
 
 urlpatterns = [
