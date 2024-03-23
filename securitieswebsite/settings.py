@@ -1,4 +1,5 @@
 import environ
+import redis
 from django.contrib import messages
 import os
 
@@ -73,13 +74,15 @@ DATABASES = {
     }
 }
 
+EXCHANGE = redis.Redis(host=env('REDIS_HOST'), port=env('REDIS_PORT'), db=2, decode_responses=True)
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": env('REDIS') + "/1",
+        "LOCATION": "redis://" + env('REDIS_HOST') + ":" + env('REDIS_PORT') + "/1",
         "KEY_PREFIX": "fin"
     }
 }
@@ -90,7 +93,7 @@ CACHE_TTL = 60 * 15
 DRAMATIQ_BROKER = {
     "BROKER": "dramatiq.brokers.redis.RedisBroker",
     "OPTIONS": {
-        "url": env('REDIS') + "/0",
+        "url": "redis://" + env('REDIS_HOST') + ":" + env('REDIS_PORT') + "/0",
     },
     "MIDDLEWARE": [
         "dramatiq.middleware.Prometheus",
@@ -108,7 +111,7 @@ DRAMATIQ_TASKS_DATABASE = "default"
 DRAMATIQ_RESULT_BACKEND = {
     "BACKEND": "dramatiq.results.backends.redis.RedisBackend",
     "BACKEND_OPTIONS": {
-        "url": env('REDIS'),
+        "url": "redis://" + env('REDIS_HOST') + ":" + env('REDIS_PORT'),
     },
     "MIDDLEWARE_OPTIONS": {
         "result_ttl": 1000 * 60 * 10
