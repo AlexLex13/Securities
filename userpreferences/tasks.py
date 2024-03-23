@@ -9,8 +9,9 @@ from weasyprint import HTML
 
 from userpreferences.utils import create_df
 
+
 @dramatiq.actor
-def create_json(response, user_preference):
+def create_json(user_preference):
     bonds_df, shares_df = create_df(user_preference)
 
     with StringIO() as io:
@@ -26,12 +27,11 @@ def create_json(response, user_preference):
         io.seek(0)
 
         json.dump(res, io, indent=4, ensure_ascii=False)
-
-        response.write(io.getvalue())
+        return io.getvalue()
 
 
 @dramatiq.actor
-def create_pdf(response, user_preference):
+def create_pdf(user_preference):
     bonds = user_preference.bonds.all().select_related('company')
     shares = user_preference.shares.all().select_related('company')
 
@@ -45,11 +45,11 @@ def create_pdf(response, user_preference):
         output.write(result)
         output.flush()
         output.seek(0)
-        response.write(output.read())
+        return output.read()
 
 
 @dramatiq.actor
-def create_excel(response, user_preference):
+def create_excel(user_preference):
     bonds_df, shares_df = create_df(user_preference)
 
     with BytesIO() as b:
@@ -57,4 +57,4 @@ def create_excel(response, user_preference):
         bonds_df.to_excel(writer, sheet_name='Bonds')
         shares_df.to_excel(writer, sheet_name='Shares')
         writer.close()
-        response.write(b.getvalue())
+        return b.getvalue()

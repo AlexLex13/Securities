@@ -9,6 +9,7 @@
       <a href="{% url 'send_pref' %}" class="btn btn-primary">Send to</a>
     </div>
   </div>
+<br>
 
 <div class="app-table">
   <table class="table table-stripped table-hover table-sm table-bordered">
@@ -25,10 +26,10 @@
     </thead>
 
     <tbody>
-      {% for pref in page_obj%}
+      {% for pref in page_obj %}
       <tr>
-        <td>-</td>
-        <td>-</td>
+        <td>{{ pref.sender }}</td>
+        <td>{{ pref.description }}</td>
 
         <td>
           <a href="#"

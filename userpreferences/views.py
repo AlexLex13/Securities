@@ -149,8 +149,7 @@ def export_json(request, name):
 
     user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
-    create_json(response, user_preference)
-
+    response.write(create_json(user_preference))
     return response
 
 
@@ -162,8 +161,7 @@ def export_pdf(request, name):
 
     user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
-    create_pdf(response, user_preference)
-
+    response.write(create_pdf(user_preference))
     return response
 
 
@@ -174,27 +172,5 @@ def export_excel(request, name):
 
     user_preference = UserPreference.objects.get(user=request.user, slug=name)
 
-    create_excel(response, user_preference)
-
+    response.write(create_excel(user_preference))
     return response
-
-
-@login_required(login_url='/authentication/login')
-def exchange(request):
-    if request.method == 'GET':
-        return render(request, 'preferences/exchange/index.html')
-
-
-@login_required(login_url='/authentication/login')
-def send_preference(request):
-    if request.method == 'GET':
-        return render(request, 'preferences/exchange/send.html')
-
-    if request.method == 'POST':
-        sender_name = request.POST['sender_name']
-        name = request.POST['name']
-        description = request.POST['description']
-        pref = request.POST['pref_name']
-        print(sender_name, name, description, pref)
-
-        return redirect('exchange')
