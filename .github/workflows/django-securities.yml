@@ -16,7 +16,8 @@ jobs:
       DB_PASSWORD: postgres
       DB_HOST: '127.0.0.1'
       DB_PORT: 5432
-      REDIS: 'redis://127.0.0.1:6379'
+      REDIS_HOST: '127.0.0.1'
+      REDIS_PORT: 6379
       EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
       EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
       EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
