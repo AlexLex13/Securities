@@ -1,6 +1,5 @@
 import json
 
-from django.conf import settings
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -15,6 +14,7 @@ from django.views import View
 from django.views.decorators.cache import cache_page
 from validate_email import validate_email
 
+from securitieswebsite import settings
 from .tasks import sent_activate_mail
 from .utils import account_activation_token
 
