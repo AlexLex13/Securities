@@ -57,4 +57,7 @@ def send_preference(request):
 
 @login_required(login_url='/authentication/login')
 def del_pref_from_inbox(request):
-    pass
+    redis_exchange.json().arrpop(request.user.username, '$', request.GET['pos'])
+    return redirect('exchange')
+
+

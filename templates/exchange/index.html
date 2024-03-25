@@ -19,6 +19,7 @@
             <th>Sender name</th>
             <th>Description</th>
             <th></th>
+            <th></th>
         {% else %}
             <h5>The mail is empty!</h5>
         {% endif %}
@@ -33,8 +34,14 @@
 
         <td>
           <a href="#"
-            class="btn btn-secondary btn-sm"
+            class="btn btn-outline-primary btn-sm"
             >Show</a
+          >
+        </td>
+        <td>
+          <a href="{% url "del_prop" %}?pos={{ forloop.counter0 }}"
+            class="btn btn-secondary btn-sm"
+            >Delete</a
           >
         </td>
       </tr>
