@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -61,3 +63,13 @@ def del_pref_from_inbox(request):
     return redirect('exchange')
 
 
+@login_required(login_url='/authentication/login')
+def show_pref_from_inbox(request):
+    res = redis_exchange.json().get(request.user.username, f'$[{request.GET['pos']}].pref')
+    securities = json.loads(*res)
+    context = {
+        'position': request.GET['pos'],
+        'bonds': securities["Bonds"],
+        'shares': securities["Shares"],
+    }
+    return render(request, 'exchange/show.html', context)

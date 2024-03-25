@@ -1,0 +1,118 @@
+{% extends 'base_user.html'%}
+{% load static %}
+{% block content %}
+
+<div class="container mt-3">
+  {% include 'partials/_messages.html' %}
+
+  <div class="row-cols-1">
+    <div style="display:inline;">
+      <a href="{% url 'exchange' %}" class="btn btn-primary">Back</a>
+      <a href="#" class="btn btn-info">Add</a>
+      <a href="{% url "del_prop" %}?pos={{ position }}" class="btn btn-secondary">Delete</a>
+    </div>
+  </div>
+
+  <br>
+  <div class="app-table" id="bonds_table">
+    <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:11.5px;">
+      <thead class="thead-light">
+        <tr>
+          {% if bonds %}
+              <th>Name</th>
+              <th>maturity_years</th>
+              <th>profitability</th>
+              <th>coupon_yield</th>
+              <th>coupon_yield_last</th>
+              <th>rating</th>
+              <th>volume</th>
+              <th>coupon_value</th>
+              <th>coupon_payments_frequency</th>
+              <th>accumulated_income</th>
+              <th>duration</th>
+              <th>price</th>
+              <th>next_coupon_date</th>
+              <th>issue_date</th>
+              <th>maturity_date</th>
+              <th>offer_date</th>
+              <th>company</th>
+              <th></th>
+          {% else %}
+              <h5>There are no bonds yet!</h5>
+          {% endif %}
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for bond in bonds %}
+        <tr>
+          <td>{{bond.name}}</td>
+          <td>{{bond.maturity_years}}</td>
+          <td>{{bond.profitability}}</td>
+          <td>{{bond.coupon_yield}}</td>
+          <td>{{bond.coupon_yield_last}}</td>
+          <td>{{bond.rating}}</td>
+          <td>{{bond.volume}}</td>
+          <td>{{bond.coupon_value}}</td>
+          <td>{{bond.coupon_payments_frequency}}</td>
+          <td>{{bond.accumulated_income}}</td>
+          <td>{{bond.duration}}</td>
+          <td>{{bond.price}}</td>
+          <td>{{bond.next_coupon_date}}</td>
+          <td>{{bond.issue_date}}</td>
+          <td>{{bond.maturity_date}}</td>
+          <td>{{bond.offer_date}}</td>
+          <td>{{bond.company.name}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="app-table" id="shares_table" style="display: none">
+      <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
+        <thead>
+          <tr>
+            {% if shares %}
+                <th>Name</th>
+                <th>ticker</th>
+                <th>last_price</th>
+                <th>price_change</th>
+                <th>volume</th>
+                <th>last_transaction_time</th>
+                <th>weekly_price_change</th>
+                <th>monthly_price_change</th>
+                <th>annual_price_change</th>
+                <th>capitalization</th>
+                <th>volume_change</th>
+                <th>company</th>
+            {% else %}
+                <h5>There are no shares yet!</h5>
+            {% endif %}
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for share in shares %}
+          <tr>
+            <td>{{share.name}}</td>
+            <td>{{share.ticker}}</td>
+            <td>{{share.last_price}}</td>
+            <td>{{share.price_change}}</td>
+            <td>{{share.volume}}</td>
+            <td>{{share.last_transaction_time}}</td>
+            <td>{{share.weekly_price_change}}</td>
+            <td>{{share.monthly_price_change}}</td>
+            <td>{{share.annual_price_change}}</td>
+            <td>{{share.capitalization}}</td>
+            <td>{{share.volume_change}}</td>
+            <td>{{share.company}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+
+<script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}

@@ -33,7 +33,7 @@
         <td>{{ pref.description }}</td>
 
         <td>
-          <a href="#"
+          <a href="{% url "show_prop" %}?pos={{ forloop.counter0 }}"
             class="btn btn-outline-primary btn-sm"
             >Show</a
           >
