@@ -3,6 +3,7 @@ from datetime import datetime
 import pandas as pd
 
 from bonds.models import Bond
+from companies.models import Company
 from shares.models import Share
 
 
@@ -31,9 +32,9 @@ def parse_bonds_json(lst):
         for k, v in dct.items():
             if dct[k]:
                 if k in ('volume', 'coupon_value', 'price', 'accumulated_income'):
-                   dct[k] = float(v.strip('$').replace(',', ''))
+                    dct[k] = float(v.strip('$').replace(',', ''))
                 if k in ('next_coupon_date', 'issue_date', 'maturity_date', 'offer_date'):
-                   dct[k] = datetime.strptime(v[:10], '%Y-%m-%d').date()
+                    dct[k] = datetime.strptime(v[:10], '%Y-%m-%d').date()
 
         bonds.append(dct)
     return bonds
@@ -51,3 +52,19 @@ def parse_shares_json(lst):
 
         shares.append(dct)
     return shares
+
+
+def add_securities(bonds_list, shares_list, user_preference):
+    for bond_fields in bonds_list:
+        company = bond_fields.pop('company')
+
+        bond = Bond.objects.update_or_create(**bond_fields, company=Company.objects.get(name=company))
+
+        user_preference.bonds.add(bond[0])
+
+    for share_fields in shares_list:
+        company = share_fields.pop('company')
+
+        share = Share.objects.update_or_create(**share_fields, company=Company.objects.get(name=company))
+
+        user_preference.shares.add(share[0])

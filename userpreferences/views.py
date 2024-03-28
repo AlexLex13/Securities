@@ -10,11 +10,13 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 
 from bonds.models import Bond
-from companies.models import Company
+from securitieswebsite import settings
 from shares.models import Share
 from .models import UserPreference
 from .tasks import create_pdf, create_excel, create_json
-from .utils import parse_bonds_json, parse_shares_json
+from .utils import parse_bonds_json, parse_shares_json, add_securities
+
+redis_exchange = getattr(settings, 'EXCHANGE')
 
 
 @login_required(login_url='/authentication/login')
@@ -38,7 +40,7 @@ def show_user_preferences(request):
 @login_required(login_url='/authentication/login')
 def create_preference(request):
     if request.method == 'GET':
-        return render(request, 'preferences/add.html')
+        return render(request, 'preferences/add.html', {"exchange": request.GET["pos"]})
 
     if request.method == 'POST':
         name = request.POST['name']
@@ -49,6 +51,13 @@ def create_preference(request):
             return redirect('create-preference')
 
         user_preference = UserPreference.objects.create(name=name, description=description, user=request.user)
+
+        if request.POST["exchange"]:
+            res = redis_exchange.json().get(request.user.username, f'$[{request.POST['exchange']}].pref')
+            securities = json.loads(*res)
+            bonds_list = parse_bonds_json(securities['Bonds'])
+            shares_list = parse_shares_json(securities['Shares'])
+            add_securities(bonds_list, shares_list, user_preference)
 
         if request.POST.getlist('import'):
             file = request.FILES['file']
@@ -68,23 +77,11 @@ def create_preference(request):
                     io.seek(0)
 
             if file.content_type.endswith('json'):
-                ct = json.load(file)
-                bonds_list = parse_bonds_json(ct['Bonds'])
-                shares_list = parse_shares_json(ct['Shares'])
+                securities = json.load(file)
+                bonds_list = parse_bonds_json(securities['Bonds'])
+                shares_list = parse_shares_json(securities['Shares'])
 
-            for bond_fields in bonds_list:
-                company = bond_fields.pop('company')
-
-                bond = Bond.objects.update_or_create(**bond_fields, company=Company.objects.get(name=company))
-
-                user_preference.bonds.add(bond[0])
-
-            for share_fields in shares_list:
-                company = share_fields.pop('company')
-
-                share = Share.objects.update_or_create(**share_fields, company=Company.objects.get(name=company))
-
-                user_preference.shares.add(share[0])
+            add_securities(bonds_list, shares_list, user_preference)
 
         messages.success(request, f'Set "{name}" has been successfully created')
         return redirect('preferences')
