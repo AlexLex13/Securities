@@ -8,8 +8,8 @@
   <div class="row-cols-1">
     <div style="display:inline;">
       <a href="{% url 'exchange' %}" class="btn btn-primary">Back</a>
-      <a href="#" class="btn btn-info">Add</a>
-      <a href="{% url "del_prop" %}?pos={{ position }}" class="btn btn-secondary">Delete</a>
+      <a href="{% url 'create-preference' %}?pos={{ position }}" class="btn btn-info">Add</a>
+      <a href="{% url 'del_prop' %}?pos={{ position }}" class="btn btn-secondary">Delete</a>
     </div>
   </div>
 
