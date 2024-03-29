@@ -28,21 +28,22 @@
       </div>
     </div>
 <div class="app-table">
-  <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:14px;">
+  <table class="table table-stripped table-hover table-sm table-bordered" style="font-size:16px;">
     <thead>
       <tr>
         <th>№</th>
         <th>Name</th>
         <th>ticker</th>
-        <th>last_price</th>
-        <th>price_change</th>
-        <th>volume</th>
-        <th>last_transaction_time</th>
-        <th>weekly_price_change</th>
-        <th>monthly_price_change</th>
-        <th>annual_price_change</th>
+        <th>graph</th>
+        <th>last price</th>
+        <th>price change</th>
+        <th> volume </th>
+        <th>last transaction time</th>
+        <th>weekly price change</th>
+        <th>monthly price change</th>
+        <th>annual price change</th>
         <th>capitalization</th>
-        <th>volume_change</th>
+        <th>volume change</th>
         <th>company</th>
         <th></th>
       </tr>
@@ -52,7 +53,14 @@
       {% for share in shares %}
       <tr>
         <td>{{ forloop.counter }}</td>
-        {% for field in share %}
+        {% for field in share|slice:":-1" %}
+            {% if forloop.counter == 3 %}
+                <td>
+                    <a href="{{ share|last }}" title="График Акций" target="_blank">
+                        <img src="{% static 'img/logo.png' %}" height="30" width="30" alt="-">
+                    </a>
+                </td>
+            {% endif %}
             <td>{{field}}</td>
         {% endfor %}
         <td>

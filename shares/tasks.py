@@ -20,7 +20,10 @@ def fetch_shares():
         for j in (1, 2, *list(range(6, 12)), 13, 15, 16):
             share_fields.append(bs.find('tbody').find_all('tr')[i].find_all('td')[j].text.strip())
         share_fields.append(' '.join(bs.find('tbody').find_all('tr')[i].find_all('td')[1].find('a').get('title')
-                                    .split()[2:]))
+                                     .split()[2:]))
+        share_fields.append("https://smart-lab.ru/" + bs.find('tbody').find_all('tr')[i].find_all('td')[4]
+                            .find('a').get('href'))
+
         shares.append(share_fields)
 
     return shares
