@@ -54,6 +54,7 @@ def send_preference(request):
             "pref": create_json(preference)
         })
 
+        messages.success(request, f'Preference has been successfully sent')
         return redirect('exchange')
 
 
