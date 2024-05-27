@@ -40,7 +40,8 @@ def show_user_preferences(request):
 @login_required(login_url='/authentication/login')
 def create_preference(request):
     if request.method == 'GET':
-        return render(request, 'preferences/add.html', {"exchange": request.GET["pos"]})
+
+        return render(request, 'preferences/add.html', {"exchange": request.GET.get("pos")})
 
     if request.method == 'POST':
         name = request.POST['name']
@@ -52,7 +53,7 @@ def create_preference(request):
 
         user_preference = UserPreference.objects.create(name=name, description=description, user=request.user)
 
-        if request.POST["exchange"]:
+        if request.POST.get("exchange"):
             res = redis_exchange.json().get(request.user.username, f'$[{request.POST['exchange']}].pref')
             securities = json.loads(*res)
             bonds_list = parse_bonds_json(securities['Bonds'])
