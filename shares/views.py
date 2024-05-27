@@ -5,20 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django.views.generic import ListView
 
 from companies.models import Company
-from securitieswebsite import settings
 from userpreferences.models import UserPreference
 from .models import Share
 from .tasks import fetch_shares, processing_shares
 
-CACHE_TTL = getattr(settings, 'CACHE_TTL')
 
-
-@method_decorator(cache_page(CACHE_TTL), name='dispatch')
 class SharesView(ListView):
     template_name = 'shares/index.html'
     context_object_name = 'shares'

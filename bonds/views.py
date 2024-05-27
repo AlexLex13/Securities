@@ -5,19 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.views.decorators.cache import cache_page
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from companies.models import Company
-from securitieswebsite import settings
 from userpreferences.models import UserPreference
 from .models import Bond
 from .tasks import fetch_bonds, processing_bonds
 
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
-
-@cache_page(CACHE_TTL)
 def index(request):
     bonds = fetch_bonds()
     paginator = Paginator(bonds, 15)
